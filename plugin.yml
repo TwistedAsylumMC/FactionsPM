@@ -1,0 +1,10 @@
+name: FactionsPM
+description: A new factions plugin for PocketMine-MP
+
+main: twisted\factionspm\FactionsPM
+version: 1.0.0
+api: 3.2.0
+extensions: [sqlite3]
+
+author: Twisted
+website: https://github.com/TwistedAsylumMC/FactionsPM
