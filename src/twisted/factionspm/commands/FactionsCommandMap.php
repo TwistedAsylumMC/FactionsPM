@@ -28,11 +28,14 @@ use twisted\factionspm\commands\defaults\CreateCommand;
 use twisted\factionspm\commands\defaults\DescriptionCommand;
 use twisted\factionspm\commands\defaults\DisbandCommand;
 use twisted\factionspm\commands\defaults\HelpCommand;
+use twisted\factionspm\commands\defaults\HomeCommand;
 use twisted\factionspm\commands\defaults\InviteCommand;
 use twisted\factionspm\commands\defaults\KickCommand;
 use twisted\factionspm\commands\defaults\LeaveCommand;
 use twisted\factionspm\commands\defaults\NameCommand;
+use twisted\factionspm\commands\defaults\SetHomeCommand;
 use twisted\factionspm\commands\defaults\UnInviteCommand;
+use twisted\factionspm\commands\defaults\UnsetHomeCommand;
 use twisted\factionspm\commands\defaults\VersionCommand;
 use twisted\factionspm\FactionsPM;
 use function array_shift;
@@ -56,11 +59,14 @@ class FactionsCommandMap extends Command{
         $this->registerCommand(new DescriptionCommand());
         $this->registerCommand(new DisbandCommand());
         $this->registerCommand(new HelpCommand());
+        $this->registerCommand(new HomeCommand());
         $this->registerCommand(new InviteCommand());
         $this->registerCommand(new KickCommand());
         $this->registerCommand(new LeaveCommand());
         $this->registerCommand(new NameCommand());
+        $this->registerCommand(new SetHomeCommand());
         $this->registerCommand(new UnInviteCommand());
+        $this->registerCommand(new UnsetHomeCommand());
         $this->registerCommand(new VersionCommand());
     }
 

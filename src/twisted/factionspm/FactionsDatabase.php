@@ -20,6 +20,7 @@ declare(strict_types=1);
 
 namespace twisted\factionspm;
 
+use pocketmine\level\Position;
 use pocketmine\Server;
 use SQLite3;
 use function array_values;
@@ -32,7 +33,7 @@ class FactionsDatabase{
 
     public function __construct(string $path){
         $this->database = new SQLite3($path);
-        $this->database->exec("CREATE TABLE IF NOT EXISTS Factions(Id INTEGER PRIMARY KEY AUTOINCREMENT, Faction VARCHAR(15) NOT NULL, Leader VARCHAR(15) NOT NULL, Description VARCHAR(100) NOT NULL DEFAULT 'No description set', homeX REAL DEFAULT null, homeY REAL DEFAULT null, homeZ REAL DEFAULT null)");
+        $this->database->exec("CREATE TABLE IF NOT EXISTS Factions(Id INTEGER PRIMARY KEY AUTOINCREMENT, Faction VARCHAR(15) NOT NULL, Leader VARCHAR(15) NOT NULL, Description VARCHAR(100) NOT NULL DEFAULT 'No description set', HomeX REAL DEFAULT null, HomeY REAL DEFAULT null, HomeZ REAL DEFAULT null, HomeWorld VARCHAR(255) DEFAULT null)");
         $this->database->exec("CREATE TABLE IF NOT EXISTS Players(Username VARCHAR(15) NOT NULL PRIMARY KEY, Faction INTEGER NOT NULL DEFAULT 0, FactionRank VARCHAR(15) NOT NULL DEFAULT 'Member')");
     }
 
@@ -53,14 +54,7 @@ class FactionsDatabase{
 
         $this->setPlayerFaction($leader, $id, "Leader");
 
-        return new Faction($id, $faction, "No description set", $leader, [], [], null, null, null ,Server::getInstance()->getDefaultLevel()->getName());
-    }
-
-    public function deleteFaction(int $faction) : void{
-        $stmt = $this->database->prepare("DELETE FROM Factions WHERE Id='" . $faction . "'");
-        $stmt->execute();
-        $stmt = $this->database->prepare("UPDATE Players SET Faction='0', FactionRank='Member' WHERE Faction='" . $faction . "'");
-        $stmt->execute();
+        return new Faction($id, $faction, "No description set", $leader, [], [], null, null, null, Server::getInstance()->getDefaultLevel()->getName());
     }
 
     public function factionExists(string $faction) : bool{
@@ -80,34 +74,16 @@ class FactionsDatabase{
         return (int) $result["Id"];
     }
 
-    public function getFaction(int $id) : ?Faction{
-        $stmt = $this->database->prepare("SELECT * FROM Factions WHERE Id='" . $id . "'");
-        $result = $stmt->execute()->fetchArray();
-        if(!$result){
-            return null;
-        }
-
-        return new Faction($id, $result["Faction"], $result["Description"], $result["Leader"], $this->getFactionModerators($id), $this->getFactionMembers($id), $result["homeX"], $result["homeY"], $result["homeZ"], $result["homeWorld"]);
+    public function setPlayerFaction(string $player, int $faction, string $rank) : void{
+        $stmt = $this->database->prepare("UPDATE Players SET Faction='" . $faction . "', FactionRank='" . $rank . "' WHERE Username='" . $player . "'");
+        $stmt->execute();
     }
 
-    public function getFactionModerators(int $faction) : array{
-        $stmt = $this->database->prepare("SELECT Username FROM Players WHERE Faction='" . $faction . "' AND FactionRank='Moderator'");
-        $result = $stmt->execute()->fetchArray();
-        if(!$result){
-            return [];
-        }
-
-        return array_values($result);
-    }
-
-    public function getFactionMembers(int $faction) : array{
-        $stmt = $this->database->prepare("SELECT Username FROM Players WHERE Faction='" . $faction . "' AND FactionRank='Member'");
-        $result = $stmt->execute()->fetchArray();
-        if(!$result){
-            return [];
-        }
-
-        return array_values($result);
+    public function deleteFaction(int $faction) : void{
+        $stmt = $this->database->prepare("DELETE FROM Factions WHERE Id='" . $faction . "'");
+        $stmt->execute();
+        $stmt = $this->database->prepare("UPDATE Players SET Faction='0', FactionRank='Member' WHERE Faction='" . $faction . "'");
+        $stmt->execute();
     }
 
     public function updateFactionName(int $faction, string $name) : void{
@@ -117,6 +93,11 @@ class FactionsDatabase{
 
     public function updateFactionDescription(int $faction, string $description) : void{
         $stmt = $this->database->prepare("UPDATE Factions SET Description='" . $description . "' WHERE Id='" . $faction . "'");
+        $stmt->execute();
+    }
+
+    public function updateFactionHome(int $faction, ?Position $home) : void{
+        $stmt = $this->database->prepare("UPDATE Factions SET HomeX='" . ($home === null ? null : $home->getX()) . "', HomeY='" . ($home === null ? null : $home->getY()) . "', HomeZ='" . ($home === null ? null : $home->getZ()) . "', HomeWorld='" . ($home === null ? null : $home->getLevel()->getName()) . "' WHERE Id='" . $faction . "'");
         $stmt->execute();
     }
 
@@ -141,8 +122,33 @@ class FactionsDatabase{
         $stmt->execute();
     }
 
-    public function setPlayerFaction(string $player, int $faction, string $rank) : void{
-        $stmt = $this->database->prepare("UPDATE Players SET Faction='" . $faction . "', FactionRank='" . $rank . "' WHERE Username='" . $player . "'");
-        $stmt->execute();
+    public function getFaction(int $id) : ?Faction{
+        $stmt = $this->database->prepare("SELECT * FROM Factions WHERE Id='" . $id . "'");
+        $result = $stmt->execute()->fetchArray();
+        if(!$result){
+            return null;
+        }
+
+        return new Faction($id, $result["Faction"], $result["Description"], $result["Leader"], $this->getFactionModerators($id), $this->getFactionMembers($id), $result["HomeX"], $result["HomeY"], $result["HomeZ"], $result["HomeWorld"]);
+    }
+
+    public function getFactionModerators(int $faction) : array{
+        $stmt = $this->database->prepare("SELECT Username FROM Players WHERE Faction='" . $faction . "' AND FactionRank='Moderator'");
+        $result = $stmt->execute()->fetchArray();
+        if(!$result){
+            return [];
+        }
+
+        return array_values($result);
+    }
+
+    public function getFactionMembers(int $faction) : array{
+        $stmt = $this->database->prepare("SELECT Username FROM Players WHERE Faction='" . $faction . "' AND FactionRank='Member'");
+        $result = $stmt->execute()->fetchArray();
+        if(!$result){
+            return [];
+        }
+
+        return array_values($result);
     }
 }

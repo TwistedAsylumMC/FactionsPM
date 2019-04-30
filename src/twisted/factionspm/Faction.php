@@ -20,6 +20,7 @@ declare(strict_types=1);
 
 namespace twisted\factionspm;
 
+use pocketmine\level\Position;
 use pocketmine\Server;
 use function array_flip;
 use function array_map;
@@ -47,13 +48,21 @@ class Faction{
     /** @var string[] */
     private $members;
 
-    public function __construct(int $id, string $name, string $description, string $leader, array $moderators, array $members){
+    /** @var null|Position */
+    private $home;
+
+    public function __construct(int $id, string $name, string $description, string $leader, array $moderators, array $members, ?float $homeX, ?float $homeY, ?float $homeZ, ?string $homeWorld){
         $this->id = $id;
         $this->name = $name;
         $this->description = $description;
         $this->leader = $leader;
         $this->moderators = $moderators;
         $this->members = $members;
+        if($homeX === null || $homeY === null || $homeZ === null || $homeWorld === null){
+            $this->home = null;
+        }else{
+            $this->home = new Position($homeX, $homeY, $homeZ, Server::getInstance()->getLevelByName($homeWorld));
+        }
     }
 
     public function getId() : int{
@@ -168,5 +177,13 @@ class Faction{
                 $member->sendMessage($message);
             }
         }
+    }
+
+    public function getHome() : ?Position{
+        return $this->home;
+    }
+
+    public function setHome(?Position $home) : void{
+        $this->home = $home;
     }
 }
