@@ -31,6 +31,7 @@ use twisted\factionspm\commands\defaults\HelpCommand;
 use twisted\factionspm\commands\defaults\HomeCommand;
 use twisted\factionspm\commands\defaults\InviteCommand;
 use twisted\factionspm\commands\defaults\KickCommand;
+use twisted\factionspm\commands\defaults\LeaderCommand;
 use twisted\factionspm\commands\defaults\LeaveCommand;
 use twisted\factionspm\commands\defaults\NameCommand;
 use twisted\factionspm\commands\defaults\SetHomeCommand;
@@ -62,6 +63,7 @@ class FactionsCommandMap extends Command{
         $this->registerCommand(new HomeCommand());
         $this->registerCommand(new InviteCommand());
         $this->registerCommand(new KickCommand());
+        $this->registerCommand(new LeaderCommand());
         $this->registerCommand(new LeaveCommand());
         $this->registerCommand(new NameCommand());
         $this->registerCommand(new SetHomeCommand());

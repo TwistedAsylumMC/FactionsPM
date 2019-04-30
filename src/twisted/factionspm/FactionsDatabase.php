@@ -101,6 +101,11 @@ class FactionsDatabase{
         $stmt->execute();
     }
 
+    public function updateFactionLeader(int $faction, string $leader) : void{
+        $stmt = $this->database->prepare("UPDATE Factions SET Leader='" . $leader . "' WHERE Id='" . $faction . "'");
+        $stmt->execute();
+    }
+
     public function getPlayerFaction(string $player) : ?Faction{
         $stmt = $this->database->prepare("SELECT Faction FROM Players WHERE Username='" . $player . "'");
         $result = $stmt->execute()->fetchArray();
@@ -128,8 +133,12 @@ class FactionsDatabase{
         if(!$result){
             return null;
         }
+        $homeX = $result["HomeX"] === "" ? null : $result["HomeX"];
+        $homeY = $result["HomeY"] === "" ? null : $result["HomeY"];
+        $homeZ = $result["HomeZ"] === "" ? null : $result["HomeZ"];
+        $homeWorld = $result["HomeWorld"] === "" ? null : $result["HomeWorld"];
 
-        return new Faction($id, $result["Faction"], $result["Description"], $result["Leader"], $this->getFactionModerators($id), $this->getFactionMembers($id), $result["HomeX"], $result["HomeY"], $result["HomeZ"], $result["HomeWorld"]);
+        return new Faction($id, $result["Faction"], $result["Description"], $result["Leader"], $this->getFactionModerators($id), $this->getFactionMembers($id), $homeX, $homeY, $homeZ, $homeWorld);
     }
 
     public function getFactionModerators(int $faction) : array{
