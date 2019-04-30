@@ -70,6 +70,11 @@ class LeaderCommand extends FactionsCommand{
         $database->setPlayerFaction($sender->getName(), $faction->getId(), "Moderator");
         $database->setPlayerFaction($target->getName(), $faction->getId(), "Leader");
         $faction->setLeader($target->getName());
+        if($faction->isModerator($target->getName())){
+            $faction->removeModerator($target->getName());
+        }else{
+            $faction->removeMember($target->getName());
+        }
         $faction->addModerator($sender->getName());
         $faction->broadcastMessage(TextFormat::GREEN . $sender->getName() . " has given the faction's leadership to " . $target->getName());
     }
