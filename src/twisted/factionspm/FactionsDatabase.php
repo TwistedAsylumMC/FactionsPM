@@ -132,6 +132,9 @@ class FactionsDatabase{
     }
 
     public function getFaction(int $id) : ?Faction{
+        if(($fac = $this->cache->getFactionFromCache($id)) !== null){
+            return $fac;
+        }
         $stmt = $this->database->prepare("SELECT * FROM Factions WHERE Id='" . $id . "'");
         $result = $stmt->execute()->fetchArray();
         if(!$result){
@@ -146,6 +149,9 @@ class FactionsDatabase{
     }
 
     public function getFactionModerators(int $faction) : array{
+        if(($fac = $this->cache->getFactionFromCache($faction)) !== null){
+            return $fac->getModerators();
+        }
         $stmt = $this->database->prepare("SELECT Username FROM Players WHERE Faction='" . $faction . "' AND FactionRank='Moderator'");
         $result = $stmt->execute()->fetchArray();
         if(!$result){
@@ -156,6 +162,9 @@ class FactionsDatabase{
     }
 
     public function getFactionMembers(int $faction) : array{
+        if(($fac = $this->cache->getFactionFromCache($faction)) !== null){
+            return $fac->getMembers();
+        }
         $stmt = $this->database->prepare("SELECT Username FROM Players WHERE Faction='" . $faction . "' AND FactionRank='Member'");
         $result = $stmt->execute()->fetchArray();
         if(!$result){
