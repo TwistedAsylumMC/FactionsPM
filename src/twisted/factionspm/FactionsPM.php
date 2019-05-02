@@ -25,6 +25,9 @@ use twisted\factionspm\commands\FactionsCommandMap;
 
 class FactionsPM extends PluginBase{
 
+    /** @var self */
+    private static $instance;
+
     /** @var FactionsCache */
     private $cache;
 
@@ -34,11 +37,22 @@ class FactionsPM extends PluginBase{
     /** @var FactionsDatabase */
     private $database;
 
+    public function onLoad() : void{
+        self::$instance = $this;
+    }
+
     public function onEnable() : void{
         $this->cache = new FactionsCache();
         $this->commandMap = new FactionsCommandMap($this);
         $this->database = new FactionsDatabase($this->getDataFolder() . "FactionsPM.db");
         $this->getServer()->getPluginManager()->registerEvents(new FactionsListener($this), $this);
+    }
+
+    /**
+     * @return self
+     */
+    public static function getInstance() : self{
+        return self::$instance;
     }
 
     public function getCache() : FactionsCache{
