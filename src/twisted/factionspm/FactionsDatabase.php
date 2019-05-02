@@ -28,11 +28,15 @@ use function strtolower;
 
 class FactionsDatabase{
 
+    /** @var FactionsCache */
+    private $cache;
+
     /** @var SQLite3 */
     private $database;
 
-    public function __construct(string $path){
-        $this->database = new SQLite3($path);
+    public function __construct(){
+        $this->cache = FactionsPM::getInstance()->getCache();
+        $this->database = new SQLite3(FactionsPM::getInstance()->getDataFolder() . "FactionsPM.db");
         $this->database->exec("CREATE TABLE IF NOT EXISTS Factions(Id INTEGER PRIMARY KEY AUTOINCREMENT, Faction VARCHAR(15) NOT NULL, Leader VARCHAR(15) NOT NULL, Description VARCHAR(100) NOT NULL DEFAULT 'No description set', HomeX REAL DEFAULT null, HomeY REAL DEFAULT null, HomeZ REAL DEFAULT null, HomeWorld VARCHAR(255) DEFAULT null)");
         $this->database->exec("CREATE TABLE IF NOT EXISTS Players(Username VARCHAR(15) NOT NULL PRIMARY KEY, Faction INTEGER NOT NULL DEFAULT 0, FactionRank VARCHAR(15) NOT NULL DEFAULT 'Member')");
     }

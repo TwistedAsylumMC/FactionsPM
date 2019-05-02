@@ -44,7 +44,7 @@ class FactionsPM extends PluginBase{
     public function onEnable() : void{
         $this->cache = new FactionsCache();
         $this->commandMap = new FactionsCommandMap($this);
-        $this->database = new FactionsDatabase($this->getDataFolder() . "FactionsPM.db");
+        $this->database = new FactionsDatabase();
         $this->getServer()->getPluginManager()->registerEvents(new FactionsListener($this), $this);
     }
 
